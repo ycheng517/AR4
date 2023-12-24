@@ -1,0 +1,8 @@
+pyserial
+inputs
+numpy
+ttkthemes
+opencv-python
+Pillow
+auto-py-to-exe
+matplotlib

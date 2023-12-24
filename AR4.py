@@ -55,7 +55,7 @@
 ##########################################################################
 
 
-
+import platform
 from multiprocessing.resource_sharer import stop
 from os import execv
 from tkinter import *
@@ -66,7 +66,8 @@ from ttkthemes import ThemedStyle
 from tkinter import messagebox
 from PIL import Image, ImageTk
 from matplotlib import pyplot as plt
-from pygrabber.dshow_graph import FilterGraph
+if platform.system() == 'Windows':
+  from pygrabber.dshow_graph import FilterGraph
 
 import pickle
 import serial
@@ -89,7 +90,7 @@ cropping = False
 
 root = Tk()
 root.wm_title("AR4 Software Ver 3.0")
-root.iconbitmap(r'AR.ico')
+# root.iconbitmap('AR.ico')
 root.resizable(width=False, height=False)
 root.geometry('1536x792+0+0')
 root.runTrue = 0
@@ -258,7 +259,7 @@ def startup():
 def setCom(): 
   try:
     global ser    
-    port = "COM" + comPortEntryField.get()  
+    port = "/dev/ttyACM" + comPortEntryField.get()  
     baud = 9600    
     ser = serial.Serial(port,baud)
     almStatusLab.config(text="SYSTEM READY", style="OK.TLabel")
@@ -499,6 +500,7 @@ def executeRow():
     ser.flushInput()
     time.sleep(.05)
     response = str(ser.readline().strip(),'utf-8')
+    print(response)
     manEntryField.delete(0, 'end')
     manEntryField.insert(0,response)
   ##Set Encoders 1000
@@ -524,6 +526,7 @@ def executeRow():
     ser.flushInput()
     time.sleep(.05)
     response = str(ser.readline().strip(),'utf-8')
+    print(response)
     manEntryField.delete(0, 'end')
     manEntryField.insert(0,response)   
   ##Servo Command##
@@ -4249,7 +4252,7 @@ def loadProg():
   #progframe.pack(side=RIGHT, fill=Y)
   scrollbar = Scrollbar(progframe) 
   scrollbar.pack(side=RIGHT, fill=Y)
-  tab1.progView = Listbox(progframe,width=105,height=31, yscrollcommand=scrollbar.set)
+  tab1.progView = Listbox(progframe,width=80,height=25, yscrollcommand=scrollbar.set)
   tab1.progView.bind('<<ListboxSelect>>', progViewselect)
   try:
     Prog = pickle.load(open(ProgEntryField.get(),"rb"))
@@ -8903,11 +8906,14 @@ VisYpixfoundLab = Label(tab5, text = "Y pixes returned from camera")
 ### 5 BUTTONS################################################################
 #############################################################################
 
-graph = FilterGraph()
-try:
-  camList = graph.get_input_devices()
-except:
-  camList = ["Select a Camera"]
+if platform.system() == 'Windows':
+  try:
+    graph = FilterGraph()
+    camList = graph.get_input_devices()
+  except:
+    camList = ["Select a Camera"]
+else:
+  camList = sorted([dev for dev in os.listdir('/dev') if dev.startswith('video')])
 visoptions=StringVar(tab5)
 visoptions.set("Select a Camera")
 vismenu=OptionMenu(tab5, visoptions, camList[0], *camList)
