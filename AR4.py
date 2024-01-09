@@ -444,7 +444,6 @@ def executeRow():
   global J4AngCur
   global J5AngCur
   global J6AngCur
-  global calStat
   global rowinproc
   global LineDist
   global Xv
@@ -826,8 +825,7 @@ def executeRow():
     if (moveInProc == 1):
       moveInProc == 2
     calRobotAll()
-    if (calStat == 0):
-      stopProg()
+    stopProg()
 
   ##Set tool##  
   if (cmdType == "Tool S"): 
@@ -4408,9 +4406,10 @@ def insCalibrate():
   tabNumEntryField.delete(0, 'end')
 
 def progViewselect(e):
-  selRow = tab1.progView.curselection()[0]
-  curRowEntryField.delete(0, 'end')
-  curRowEntryField.insert(0,selRow)
+  if tab1.progView.curselection():
+    selRow = tab1.progView.curselection()[0]
+    curRowEntryField.delete(0, 'end')
+    curRowEntryField.insert(0,selRow)
  
 def getSel():
   selRow = tab1.progView.curselection()[0]
@@ -8916,12 +8915,13 @@ else:
   camList = sorted([dev for dev in os.listdir('/dev') if dev.startswith('video')])
 visoptions=StringVar(tab5)
 visoptions.set("Select a Camera")
-vismenu=OptionMenu(tab5, visoptions, camList[0], *camList)
-vismenu.config(width=20)
-vismenu.place(x=10, y=10)
+if len(camList) > 0:
+    vismenu=OptionMenu(tab5, visoptions, camList[0], *camList)
+    vismenu.config(width=20)
+    vismenu.place(x=10, y=10)
+else:
+    vismenu=OptionMenu(tab5, visoptions, "No Camera Found")
 
-
- 
 
 
 
